@@ -47,7 +47,7 @@
     .small{
       font-size:12px;
       margin-top:5px;
-      color:--border;
+      color: #8b949e;
     }
     .header span {
       font-size: 14px;
@@ -147,7 +147,7 @@
     <div id="output"></div>
   </div>
 </div>
-<span class="small"><i>Noticed a bug ? <br>Contact me on discord => trafikoverflow</i></span>
+<span class="small">Noticed a bug? Contact me on discord => trafikoverflow</span>
 <div id="toast" class="toast">Copied to clipboard</div>
 
 <script>
@@ -167,7 +167,7 @@
     const fileTree = {};
     const stack = [];
 
-    for (let i = 0; i < lines.length; i++) {
+    for (let i = 1; i < lines.length; i++) {
       const match = lines[i].match(/^([│\s]*)([└├]──\s)(.+)/);
       if (!match) continue;
 
@@ -177,7 +177,7 @@
       stack[depth] = name;
       stack.length = depth + 1;
 
-      const isFile = name.includes('.');
+      const isFile = name.includes('.') || /^[A-Z0-9_-]+$/.test(name) || name === 'Makefile';
       const targetTree = isFile ? fileTree : dirTree;
       
       let current = targetTree;
