@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>easystart</title>
+  <title>tree</title>
   <style>
     :root {
       --bg: #0d1117;
@@ -21,8 +21,24 @@
       font-family: var(--font);
       display: flex;
       flex-direction: column;
-      height: 95vh;
+      height: 98vh;
       padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      opacity: 0.8;
+    }
+
+    .header span {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--text);
     }
 
     .grid {
@@ -45,10 +61,12 @@
       padding: 8px 15px;
       background: #21262d;
       border-bottom: 1px solid var(--border);
-      font-size: 12px;
+      font-size: 11px;
+      font-weight: bold;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      color: #8b949e;
     }
 
     textarea, #output {
@@ -90,20 +108,25 @@
       padding: 10px 20px;
       border-radius: 4px;
       display: none;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
 
+<div class="header">
+  <span>tree converter</span>
+</div>
+
 <div class="grid">
   <div class="box">
     <div class="label">TREE INPUT</div>
-    <textarea id="input" placeholder="Paste tree here..." spellcheck="false"></textarea>
+    <textarea id="input" placeholder="Paste tree output here..." spellcheck="false"></textarea>
   </div>
   <div class="box">
     <div class="label">
-      ONELINER
-      <button id="copy">Copy Command</button>
+      COMMAND
+      <button id="copy">Copy</button>
     </div>
     <div id="output"></div>
   </div>
@@ -138,7 +161,7 @@
       stack[depth] = name;
       stack.length = depth + 1;
 
-      const isFile = name.includes('.');
+      const isFile = name.includes('.') || /^[A-Z0-9_-]+$/.test(name) || name === 'Makefile';
       const targetTree = isFile ? fileTree : dirTree;
       
       let current = targetTree;
