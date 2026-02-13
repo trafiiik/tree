@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>tree</title>
+  <link rel="icon" type="image/png" href="static/icon.png">
+  
   <style>
     :root {
       --bg: #0d1117;
@@ -32,6 +34,12 @@
       gap: 10px;
       margin-bottom: 15px;
       opacity: 0.8;
+    }
+
+    .header img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
     }
 
     .header span {
@@ -115,13 +123,14 @@
 <body>
 
 <div class="header">
-  <span>tree converter</span>
+  <img src="static/icon.png" alt="tree icon">
+  <span>tree</span>
 </div>
 
 <div class="grid">
   <div class="box">
     <div class="label">TREE INPUT</div>
-    <textarea id="input" placeholder="Paste tree output here..." spellcheck="false"></textarea>
+    <textarea id="input" placeholder="Paste tree here..." spellcheck="false"></textarea>
   </div>
   <div class="box">
     <div class="label">
@@ -151,7 +160,7 @@
     const fileTree = {};
     const stack = [];
 
-    for (let i = 1; i < lines.length; i++) {
+    for (let i = 0; i < lines.length; i++) {
       const match = lines[i].match(/^([│\s]*)([└├]──\s)(.+)/);
       if (!match) continue;
 
@@ -161,7 +170,7 @@
       stack[depth] = name;
       stack.length = depth + 1;
 
-      const isFile = name.includes('.') || /^[A-Z0-9_-]+$/.test(name) || name === 'Makefile';
+      const isFile = name.includes('.');
       const targetTree = isFile ? fileTree : dirTree;
       
       let current = targetTree;
