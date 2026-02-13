@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>tree</title>
+  <link rel="icon" type="image/png" href="/static/icon.png">
+  <meta name="description" content="Turn a tree into a oneliner.">
+  <meta name="keywords" content="tree, oneliner">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:image" content="/static/icon.png">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --border: #30363d;
+      --accent: #238636;
+      --text: #c9d1d9;
+      --code: #79c0ff;
+      --font: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      display: flex;
+      flex-direction: column;
+      height: 98vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      opacity: 0.8;
+    }
+
+    .header img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+    .small{
+      font-size:12px;
+      margin-top:5px;
+      color: #8b949e;
+    }
+    .header span {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--text);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      flex-grow: 1;
+    }
+
+    .box {
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .label {
+      padding: 8px 15px;
+      background: #21262d;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #8b949e;
+    }
+
+    textarea, #output {
+      flex-grow: 1;
+      padding: 15px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      line-height: 1.6;
+      outline: none;
+      resize: none;
+    }
+
+    #output {
+      color: var(--code);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    button:hover { background: #2ea043; }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--accent);
+      padding: 10px 20px;
+      border-radius: 4px;
+      display: none;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <img src="/static/icon.png" alt="tree icon">
+  <span>tree</span>
+</div>
+
+<div class="grid">
+  <div class="box">
+    <div class="label">TREE INPUT</div>
+    <textarea id="input" placeholder="Paste tree here..." spellcheck="false"></textarea>
+  </div>
+  <div class="box">
+    <div class="label">
+      COMMAND
+      <button id="copy">Copy</button>
+    </div>
+    <div id="output"></div>
+  </div>
+</div>
+<span class="small">Noticed a bug? Contact me on discord => trafikoverflow</span>
+<div id="toast" class="toast">Copied to clipboard</div>
+
+<script>
+  const input = document.getElementById('input');
+  const output = document.getElementById('output');
+  const copy = document.getElementById('copy');
+  const toast = document.getElementById('toast');
+
+  input.addEventListener('input', update);
+
+  function update() {
+    const text = input.value.trim();
+    if (!text) { output.innerText = ""; return; }
+
+    const lines = text.split('\n');
+    const dirTree = {};
+    const fileTree = {};
+    const stack = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const match = lines[i].match(/^([│\s]*)([└├]──\s)(.+)/);
+      if (!match) continue;
+
+      const depth = Math.floor(match[1].length / 4);
+      const name = match[3].trim();
+      
+      stack[depth] = name;
+      stack.length = depth + 1;
+
+      const isFile = name.includes('.') || /^[A-Z0-9_-]+$/.test(name) || name === 'Makefile';
+      const targetTree = isFile ? fileTree : dirTree;
+      
+      let current = targetTree;
+      for (const part of stack) {
+        if (!current[part]) current[part] = {};
+        current = current[part];
+      }
+    }
+
+    const mkdirPart = Object.keys(dirTree).length ? `mkdir -p ${buildBraces(dirTree)}` : "";
+    const touchPart = Object.keys(fileTree).length ? `touch ${buildBraces(fileTree)}` : "";
+    
+    output.innerText = [mkdirPart, touchPart].filter(Boolean).join(' && ');
+  }
+
+  function buildBraces(node) {
+    const keys = Object.keys(node);
+    if (keys.length === 0) return "";
+    
+    if (keys.length === 1) {
+      const sub = buildBraces(node[keys[0]]);
+      return keys[0] + (sub ? "/" + sub : "");
+    }
+
+    const parts = keys.map(k => {
+      const sub = buildBraces(node[k]);
+      return k + (sub ? "/" + sub : "");
+    });
+    
+    return `{${parts.join(',')}}`;
+  }
+
+  copy.addEventListener('click', () => {
+    if (!output.innerText) return;
+    navigator.clipboard.writeText(output.innerText);
+    toast.style.display = 'block';
+    setTimeout(() => toast.style.display = 'none', 2000);
+  });
+</script>
+
+</body>
+</html>
