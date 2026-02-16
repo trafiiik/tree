@@ -125,6 +125,18 @@
       display: none;
       z-index: 10;
     }
+    .inline-option{
+    display:inline;
+    justify-content:center;
+    margin-left:auto;
+    margin-right:auto;
+    align-items:center;
+    gap:5px;
+    color:white;
+    }
+    .bold{
+    font-weight:bold;
+    }
   </style>
 </head>
 <body>
@@ -132,6 +144,15 @@
 <div class="header">
   <img src="/static/icon.png" alt="tree icon">
   <span>tree</span>
+  <div class="inline-option">
+      <label class="bold" for="enableFillAdd">Fill README and .gitignore</label>
+      <input type="checkbox" enabled="true">
+      <label for="gitignore">.gitignore template</label>
+      <select id="gitignore">
+          <option id="py">Python</option>
+          <option id="c" selected="true">C</option>
+      </select>
+  </div>
 </div>
 
 <div class="grid">
