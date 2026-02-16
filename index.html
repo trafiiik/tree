@@ -180,6 +180,11 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+    .inline-footer{
+    display:flex;
+    gap:30px;
+    justify-content:space-between;
+    }
   </style>
 </head>
 <body>
@@ -196,6 +201,7 @@
       <select id="gitignore" onchange="update()">
           <option value="python">Python</option>
           <option value="c" selected="true">C</option>
+          <option value="rust">Rust</option>
       </select>
   </div>
 </div>
@@ -213,17 +219,22 @@
     <div id="output"></div>
   </div>
 </div>
+<div class="inline-footer">
 <span class="small">Noticed a bug? Contact me on discord => trafikoverflow</span>
 <span class="small" style="text-align:center;"><a href="https://github.com/trafiiik/tree" style="color:white" target="_blank">Github repo</a></span>
 
+<i class="small" style="text-align:left;">Open an issue on github to add more gitignore templates.</i>
+
+</div>
 <div id="toast" class="toast">Copied to clipboard</div>
 <!-- Thanks : https://github.com/github/gitignore/blob/main -->
 
 <script>
   const data = {
     "gitignore":{
-      "python":"https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Python.gitignore",
-      "c":"https://raw.githubusercontent.com/github/gitignore/refs/heads/main/C.gitignore"
+      "python":"https://tree.cig.sh/static/gitignores/python.txt",
+      "c":"https://tree.cig.sh/static/gitignores/c.txt",
+      "rust":"https://tree.cig.sh/static/gitignores/rust.txt",
     },
     "readme":"# placeholder"
   }
